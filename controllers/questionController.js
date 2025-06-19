@@ -22,7 +22,7 @@ export const getQuestions = async (req, res) => {
         where: { name: category },
       });
       if (categoryRecord) {
-        categoryCondition = { categoryId: categoryRecord.id };
+        categoryCondition = { categoryid: categoryRecord.id };
       } else {
         return sendResponse(res, 200, { questions: [], totalPages: 0 });
       }
@@ -125,7 +125,7 @@ export const createQuestion = async (req, res) => {
 
     const question = await Question.create({
       userid,
-      categoryId: categoryRecord.id,
+      categoryid: categoryRecord.id,
       title: title.trim(),
       description: description.trim(),
     });
