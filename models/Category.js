@@ -6,27 +6,20 @@ const Category = sequelize.define(
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
+      field: "id",
     },
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       unique: true,
-    },
-    created_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      field: "name",
     },
   },
   {
     tableName: "categorytable",
-    timestamps: false, // We're handling timestamps manually
-    underscored: true, // Use snake_case for PostgreSQL compatibility
+    timestamps: false, // Disable automatic timestamps
   }
 );
 
