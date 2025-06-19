@@ -4,7 +4,7 @@ import { sendResponse } from "../utils/responseHandler.js";
 
 export const searchQuestions = async (req, res) => {
   try {
-    const { query, page = 1, limit = 20 } = req.query;
+    const { query, page = 1, limit = 10 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     if (!query) {
@@ -40,7 +40,7 @@ export const searchQuestions = async (req, res) => {
       description: q.description,
       username: q.User?.username,
       created_at: q.created_at,
-      tags: q.Tags.map((tag) => tag.name),
+      tags: q.Tag?.name?.map((tag) => tag.name),
     }));
 
     const totalPages = Math.ceil(count / parseInt(limit));
