@@ -12,6 +12,7 @@ const Answer = sequelize.define(
     questionid: {
       type: DataTypes.UUID,
       allowNull: false,
+      defaultValue: DataTypes.UUIDV4, // Added default for PostgreSQL
     },
     userid: {
       type: DataTypes.INTEGER,
@@ -33,6 +34,7 @@ const Answer = sequelize.define(
   {
     tableName: "answertable",
     timestamps: false,
+    underscored: true, // Added for consistent naming with PostgreSQL conventions
   }
 );
 

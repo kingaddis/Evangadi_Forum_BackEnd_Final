@@ -14,10 +14,19 @@ const Category = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     tableName: "categorytable",
-    timestamps: false,
+    timestamps: false, // We're handling timestamps manually
+    underscored: true, // Use snake_case for PostgreSQL compatibility
   }
 );
 

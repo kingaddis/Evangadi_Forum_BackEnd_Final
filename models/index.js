@@ -9,17 +9,17 @@ import QuestionTag from "./QuestionTag.js";
 
 Question.belongsToMany(Tag, {
   through: QuestionTag,
-  foreignKey: "questionId",
-  otherKey: "tagId",
+  foreignKey: "questionid",
+  otherKey: "tagid",
 });
 Tag.belongsToMany(Question, {
   through: QuestionTag,
-  foreignKey: "tagId",
-  otherKey: "questionId",
+  foreignKey: "tagid",
+  otherKey: "questionid",
 });
 
 Question.belongsTo(User, { foreignKey: "userid", targetKey: "userid" });
-Question.belongsTo(Category, { foreignKey: "categoryId", targetKey: "id" });
+Question.belongsTo(Category, { foreignKey: "categoryid", targetKey: "id" });
 
 Answer.belongsTo(User, { foreignKey: "userid", targetKey: "userid" });
 Answer.belongsTo(Question, {
@@ -27,15 +27,15 @@ Answer.belongsTo(Question, {
   targetKey: "questionid",
 });
 Answer.hasMany(Rating, {
-  foreignKey: "answerId",
+  foreignKey: "answerid",
   sourceKey: "answerid",
   as: "Ratings",
 });
 Rating.belongsTo(User, {
-  foreignKey: "userId",
+  foreignKey: "userid",
   targetKey: "userid",
   as: "Rater",
 });
-Rating.belongsTo(Answer, { foreignKey: "answerId", targetKey: "answerid" });
+Rating.belongsTo(Answer, { foreignKey: "answerid", targetKey: "answerid" });
 
 export { User, Question, QuestionTag, Answer, Rating, Tag, Category };
