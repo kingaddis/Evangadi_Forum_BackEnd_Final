@@ -5,45 +5,128 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
+export const sendResetEmail = async (to, token) => {
+  const resetUrl = `${process.env.SENDER_URL}/reset-password/${token}`;
 
-/**
- * Create nodemailer transporter
- */
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT, 10),
-  secure: process.env.EMAIL_SECURE === "true",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-/**
- * Send password reset email
- * @param {string} email - Recipient email
- * @param {string} resetToken - Reset token
- */
-export const sendResetEmail = async (email, resetToken) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
-    to: email,
-    subject: "Password Reset Request - Evangadi Forum",
+    from: process.env.EMAIL_USER,
+    to: to,
+    subject: "Password Reset Request",
     html: `
-      <p>You requested a password reset for your Evangadi Forum account.</p>
-      <p>Click the link below to reset your password:</p>
-      <a href="${resetUrl}">${resetUrl}</a>
-      <p>This link will expire in 1 hour.</p>
-      <p>If you did not request this, please ignore this email.</p>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                line-height: 1.6;
+                color: #333333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            .email-container {
+                background-color: #ffffff;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 25px;
+            }
+            .header h1 {
+                color: #2c3e50;
+                margin-bottom: 10px;
+            }
+            .content {
+                margin-bottom: 25px;
+            }
+            .reset-button {
+                display: inline-block;
+                padding: 14px 28px;
+                background: #526cf0; /* Bright blue for better visibility */
+                color:white  !important;
+                text-decoration: none;
+                font-weight: bold;
+                border-radius: 6px;
+                margin: 25px 0;
+                font-size: 16px;
+                text-align: center;
+                transition: all 0.3s ease;
+                border: 2px solid #526cf0; /* Darker border for contrast */
+            }
+            .reset-button:hover {
+                background: #526cf0; /* Slightly darker on hover */
+            }
+            .button-container {
+                text-align: center;
+                margin: 20px 0;
+            }
+            .expiry-note {
+                color: #dc2626; /* Red for urgency */
+                font-weight: bold;
+                margin: 15px 0;
+                font-size: 14px;
+            }
+            .footer {
+                font-size: 12px;
+                color: #666666;
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e5e5e5;
+            }
+            .support-link {
+                color: #2563eb;
+                text-decoration: none;
+                font-weight: bold;
+            }
+            p {
+                margin-bottom: 15px;
+                font-size: 15px;
+                color: #444444;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="header">
+                <h1>Password Reset Request</h1>
+            </div>
+            
+            <div class="content">
+                <p>Hello,</p>
+                
+                <p>We received a request to reset your password. Click the button below to create a new password:</p>
+                
+                <div class="button-container">
+                    <a href="${resetUrl}" class="reset-button">Reset My Password</a>
+                </div>
+                
+                <p class="expiry-note">⚠️ This link will expire in 1 hour.</p>
+                
+                <p>If you didn't request this password reset, please ignore this email - your account remains secure.</p>
+                
+                <p>Need help? Contact our <a href="mailto:support@yourcompany.com" class="support-link">support team</a>.</p>
+            </div>
+            
+            <div class="footer">
+                <p>© ${new Date().getFullYear()} Your Company Name</p>
+                <p>123 Business Street, City, Country</p>
+            </div>
+        </div>
+    </body>
+    </html>
     `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Password reset email sent to ${email}`);
+    console.log("Reset email sent to:", to);
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error("Failed to send email");
+    console.error("Email error:", error);
+    throw new Error("Email could not be sent");
   }
 };
