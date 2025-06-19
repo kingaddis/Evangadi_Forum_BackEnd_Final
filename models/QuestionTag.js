@@ -22,7 +22,7 @@ const QuestionTag = sequelize.define(
     },
   },
   {
-    tableName: "Questiontag",
+    tableName: "questiontag",
     timestamps: false,
   }
 );
