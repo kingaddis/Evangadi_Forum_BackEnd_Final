@@ -1,13 +1,11 @@
-// controllers/answerController.js
 import { Answer, User, Question, Rating } from "../models/index.js";
 import { sendResponse } from "../utils/responseHandler.js";
 
 export const getAnswers = async (req, res) => {
   try {
-    const { questionid } = req.params; // Updated to questionid
+    const { questionid } = req.params;
     const userId = req.user?.userid;
 
-    // Validate questionid
     if (!questionid) {
       return sendResponse(res, 400, {
         success: false,
@@ -15,8 +13,7 @@ export const getAnswers = async (req, res) => {
       });
     }
 
-    // Validate question exists
-    const question = await Question.findOne({ where: { questionid } }); // Updated to questionid
+    const question = await Question.findOne({ where: { questionid } });
     if (!question) {
       return sendResponse(res, 404, {
         success: false,
@@ -24,9 +21,8 @@ export const getAnswers = async (req, res) => {
       });
     }
 
-    // Fetch answers with associated user and rating data
     const answers = await Answer.findAll({
-      where: { questionid }, // Updated to questionid
+      where: { questionid },
       include: [
         {
           model: User,
@@ -49,7 +45,6 @@ export const getAnswers = async (req, res) => {
       order: [["created_at", "ASC"]],
     });
 
-    // Process answer data with rating calculations
     const formattedAnswers = answers.map((answer) => {
       const ratings = answer.Ratings || [];
       const userRating =
@@ -61,7 +56,7 @@ export const getAnswers = async (req, res) => {
 
       return {
         answerid: answer.answerid,
-        questionid: answer.questionid, // Updated to questionid
+        questionid: answer.questionid,
         userid: answer.userid,
         username: answer.User?.username,
         answer: answer.answer,
@@ -89,10 +84,9 @@ export const getAnswers = async (req, res) => {
 
 export const createAnswer = async (req, res) => {
   try {
-    const { questionid, answer } = req.body; // Updated to questionid
+    const { questionid, answer } = req.body;
     const { userid } = req.user;
 
-    // Validate required fields
     if (!answer || !questionid) {
       return sendResponse(res, 400, {
         success: false,
@@ -100,8 +94,7 @@ export const createAnswer = async (req, res) => {
       });
     }
 
-    // Verify question exists
-    const question = await Question.findOne({ where: { questionid } }); // Updated to questionid
+    const question = await Question.findOne({ where: { questionid } });
     if (!question) {
       return sendResponse(res, 404, {
         success: false,
@@ -109,9 +102,8 @@ export const createAnswer = async (req, res) => {
       });
     }
 
-    // Create new answer
     const newAnswer = await Answer.create({
-      questionid, // Updated to questionid
+      questionid,
       userid,
       answer,
     });
@@ -121,7 +113,7 @@ export const createAnswer = async (req, res) => {
       message: "Answer created successfully",
       answer: {
         answerid: newAnswer.answerid,
-        questionid: newAnswer.questionid, // Updated to questionid
+        questionid: newAnswer.questionid,
         userid: newAnswer.userid,
         answer: newAnswer.answer,
         created_at: newAnswer.created_at,

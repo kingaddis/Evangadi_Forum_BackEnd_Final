@@ -1,11 +1,7 @@
-/**
- * Express server setup
- * Configures middleware, routes, and database connection
- */
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import authRoutes from "./Routes/authRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import questionRoutes from "./routes/questionRoutes.js";
 import answerRoutes from "./routes/answerRoutes.js";
 import contentRoutes from "./routes/contentRoutes.js";
@@ -49,7 +45,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

@@ -18,32 +18,9 @@ Tag.belongsToMany(Question, {
   otherKey: "questionId",
 });
 
-// Define associations
 Question.belongsTo(User, { foreignKey: "userid", targetKey: "userid" });
 Question.belongsTo(Category, { foreignKey: "categoryId", targetKey: "id" });
 
-// Updated many-to-many association with explicit join table config
-Question.belongsToMany(Tag, {
-  through: {
-    model: "QuestionTag",
-    timestamps: false, // Explicitly disable timestamps
-    // Add any other join table specific options here
-  },
-  foreignKey: "questionId",
-  otherKey: "tagId",
-});
-
-Tag.belongsToMany(Question, {
-  through: {
-    model: "QuestionTag",
-    timestamps: false, // Explicitly disable timestamps
-    // Add any other join table specific options here
-  },
-  foreignKey: "tagId",
-  otherKey: "questionId",
-});
-
-// Rest of your existing associations
 Answer.belongsTo(User, { foreignKey: "userid", targetKey: "userid" });
 Answer.belongsTo(Question, {
   foreignKey: "questionid",
@@ -61,33 +38,4 @@ Rating.belongsTo(User, {
 });
 Rating.belongsTo(Answer, { foreignKey: "answerId", targetKey: "answerid" });
 
-export { User, Question,QuestionTag, Answer, Rating, Tag, Category };
-
-// Sync database (for development only)
-if (process.env.NODE_ENV === "development") {
-  sequelize
-    .sync({ force: false })
-    .then(async () => {
-      // console.log("Database & tables synced!");
-      const categories = [
-        "JavaScript",
-        "Python",
-        "Java",
-        "HTML",
-        "CSS",
-        "SQL",
-        "Node.js",
-        "React",
-        "DevOps",
-        "Cybersecurity",
-        "Others",
-      ];
-      await Category.bulkCreate(
-        categories.map((name) => ({ name })),
-        { ignoreDuplicates: true }
-      );
-    })
-    .catch((error) => {
-      console.error("Error syncing database:", error);
-    });
-}
+export { User, Question, QuestionTag, Answer, Rating, Tag, Category };

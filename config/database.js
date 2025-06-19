@@ -1,37 +1,25 @@
-/**
- * Sequelize database configuration for MySQL
- * Supports connection pooling and environment-based configuration
- */
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-/**
- * Initialize Sequelize with MySQL configuration
- */
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    dialect: "mysql",
-    dialectOptions: {
-      socketPath: "/Applications/MAMP/tmp/mysql/mysql.sock",
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
     },
-    // Remove host and port when using socket
-    pool: {
-      max: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 10,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-  }
-);
+  },
+  pool: {
+    max: parseInt(process.env.DB_CONNECTION_LIMIT, 10) || 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+  logging: process.env.NODE_ENV === "development" ? console.log : false,
+});
 
-/**
- * Test database connection
- */
 sequelize
   .authenticate()
   .then(() => {

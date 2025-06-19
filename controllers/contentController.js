@@ -8,8 +8,6 @@ export const updateContent = async (req, res) => {
     const { id } = req.params;
     const { type, title, description, answer, tags } = req.body;
 
-    console.log("updateContent: Received tags:", tags);
-
     if (type === "question") {
       const question = await Question.findOne({
         where: { questionid: id },
@@ -45,35 +43,16 @@ export const updateContent = async (req, res) => {
           tags.map(async (tagName) => {
             const trimmedTag = tagName.trim();
             if (!trimmedTag) return null;
-            try {
-              const [tag, created] = await Tag.findOrCreate({
-                where: { name: trimmedTag },
-                defaults: { name: trimmedTag },
-                transaction,
-              });
-              console.log(
-                `Tag ${trimmedTag}: ${created ? "created" : "found"}`
-              );
-              return tag;
-            } catch (err) {
-              console.error(`Error processing tag ${trimmedTag}:`, err);
-              throw err;
-            }
+            const [tag, created] = await Tag.findOrCreate({
+              where: { name: trimmedTag },
+              defaults: { name: trimmedTag },
+              transaction,
+            });
+            return tag;
           })
         );
         const validTags = tagInstances.filter((tag) => tag !== null);
         await question.setTags(validTags, { transaction });
-        const questionTags = await sequelize.models.QuestionTag.findAll({
-          where: { questionId: question.id },
-        });
-        console.log(
-          "QuestionTag entries after setTags:",
-          questionTags.map((qt) => qt.toJSON())
-        );
-      } else {
-        console.log(
-          "updateContent: No tags provided or empty array, skipping setTags"
-        );
       }
 
       const updatedQuestion = await Question.findOne({
@@ -99,12 +78,6 @@ export const updateContent = async (req, res) => {
         ],
         transaction,
       });
-
-      console.log("Updated question:", updatedQuestion?.get({ plain: true }));
-      console.log(
-        "Updated tags:",
-        updatedQuestion?.Tags?.map((tag) => tag.name) || []
-      );
 
       await transaction.commit();
 
@@ -203,14 +176,11 @@ export const deleteContent = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.error("Delete content error:", error);
-
-    const errorResponse = {
+    return sendResponse(res, 500, {
       error: "Failed to delete content",
       ...(process.env.NODE_ENV === "development" && {
         details: error.message,
       }),
-    };
-
-    return sendResponse(res, 500, errorResponse);
+    });
   }
 };

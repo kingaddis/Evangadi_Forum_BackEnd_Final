@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { Op } from "sequelize";
 import { Question, User, Tag, Category } from "../models/index.js";
 import { sendResponse } from "../utils/responseHandler.js";
@@ -12,8 +11,8 @@ export const getQuestions = async (req, res) => {
     let where = {};
     if (search) {
       where[Op.or] = [
-        { title: { [Op.like]: `%${search}%` } },
-        { description: { [Op.like]: `%${search}%` } },
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
       ];
     }
 
@@ -124,9 +123,7 @@ export const createQuestion = async (req, res) => {
       return sendResponse(res, 400, { error: "Invalid category" });
     }
 
-    const questionid = uuidv4();
     const question = await Question.create({
-      questionid,
       userid,
       categoryId: categoryRecord.id,
       title: title.trim(),
@@ -138,32 +135,19 @@ export const createQuestion = async (req, res) => {
       tagRecords = await Promise.all(
         tags.map(async (tagName) => {
           const trimmedTag = tagName.trim();
-          console.log(`Processing tag: ${trimmedTag}`);
           const [tag, created] = await Tag.findOrCreate({
             where: { name: trimmedTag },
             defaults: { name: trimmedTag },
           });
-          console.log(`Tag ${trimmedTag}: ${created ? "created" : "found"}`);
           return tag;
         })
       );
       await question.setTags(tagRecords);
-      console.log(
-        `Associated ${tagRecords.length} tags with question ${questionid}`
-      );
-      // Verify QuestionTag entries
-      const questionTags = await sequelize.models.QuestionTag.findAll({
-        where: { questionId: question.id },
-      });
-      console.log(
-        "QuestionTag entries:",
-        questionTags.map((qt) => qt.toJSON())
-      );
     }
 
     sendResponse(res, 201, {
       message: "Question created successfully",
-      questionid,
+      questionid: question.questionid,
       tags: tagRecords.map((tag) => tag.name),
     });
   } catch (error) {

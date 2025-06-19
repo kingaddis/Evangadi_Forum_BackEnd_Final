@@ -1,23 +1,13 @@
-/**
- * Rating controller
- * Handles rating operations for answers with owner validation
- */
-import { Rating, Answer, User} from "../models/index.js";
+import { Rating, Answer, User } from "../models/index.js";
 import { sendResponse } from "../utils/responseHandler.js";
 import sequelize from "../config/database.js";
 
-/**
- * Submit or update a rating for an answer
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const submitRating = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { answerId, rating } = req.body;
     const { userid } = req.user;
 
-    // Validate input
     if (!answerId || rating == null || rating < 0 || rating > 5) {
       await transaction.rollback();
       return sendResponse(res, 400, {
@@ -26,7 +16,6 @@ export const submitRating = async (req, res) => {
       });
     }
 
-    // Check if rating is a valid number (integer or .5 increment)
     if (rating % 0.5 !== 0) {
       await transaction.rollback();
       return sendResponse(res, 400, {
@@ -35,7 +24,6 @@ export const submitRating = async (req, res) => {
       });
     }
 
-    // Find answer with owner information
     const answer = await Answer.findOne({
       where: { answerid: answerId },
       include: [
@@ -56,7 +44,6 @@ export const submitRating = async (req, res) => {
       });
     }
 
-    // Prevent owner from rating their own answer
     if (answer.userid === userid) {
       await transaction.rollback();
       return sendResponse(res, 403, {
@@ -65,7 +52,6 @@ export const submitRating = async (req, res) => {
       });
     }
 
-    // Find or create rating - using the correct column names from your model
     const [ratingRecord, created] = await Rating.findOrCreate({
       where: {
         answerId: answerId,
@@ -79,12 +65,10 @@ export const submitRating = async (req, res) => {
       transaction,
     });
 
-    // Update existing rating if not created
     if (!created) {
       await ratingRecord.update({ rating }, { transaction });
     }
 
-    // Calculate new average rating
     const allRatings = await Rating.findAll({
       where: { answerId: answerId },
       attributes: ["rating"],
@@ -118,11 +102,6 @@ export const submitRating = async (req, res) => {
   }
 };
 
-/**
- * Get user's rating for an answer
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const getUserRating = async (req, res) => {
   try {
     const { answerId } = req.params;

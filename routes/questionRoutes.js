@@ -1,6 +1,3 @@
-/**
- * Question routes
- */
 import express from "express";
 import {
   getQuestions,
@@ -11,9 +8,6 @@ import { checkLogin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Public routes (none)
-
-// Protected routes
 router.get("/", checkLogin, getQuestions);
 router.get("/:questionid", checkLogin, getQuestionById);
 router.post("/", checkLogin, createQuestion);

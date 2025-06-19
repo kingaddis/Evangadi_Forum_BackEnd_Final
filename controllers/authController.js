@@ -1,7 +1,3 @@
-/**
- * Authentication controller
- * Handles user registration, login, and password reset
- */
 import bcrypt from "bcrypt";
 import { makeToken } from "../utils/jwt.js";
 import { User } from "../models/index.js";
@@ -10,11 +6,6 @@ import crypto from "crypto";
 import { sendResponse } from "../utils/responseHandler.js";
 import { Op } from "sequelize";
 
-/**
- * Check authenticated user
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const checkUser = async (req, res) => {
   try {
     const user = await User.findOne({
@@ -31,17 +22,12 @@ export const checkUser = async (req, res) => {
   }
 };
 
-/**
- * Register new user
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const register = async (req, res) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
 
     const existingUser = await User.findOne({
-      where: { username, email },
+      where: { [Op.or]: [{ username }, { email }] },
     });
     if (existingUser?.username === username) {
       return sendResponse(res, 400, { error: "Username already taken" });
@@ -70,11 +56,6 @@ export const register = async (req, res) => {
   }
 };
 
-/**
- * Login user
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -105,11 +86,6 @@ export const login = async (req, res) => {
   }
 };
 
-/**
- * Request password reset
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -134,22 +110,11 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-/**
- * Reset password
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
-/**
- * Reset password
- * @param {Object} req - Express request
- * @param {Object} res - Express response
- */
 export const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     let password = newPassword;
-    console.log("Reset password request:", { token, password });
-    // Validate password exists
+
     if (!password) {
       return sendResponse(res, 400, {
         error: "Password is required",
@@ -169,7 +134,6 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    // Validate password is not empty
     if (typeof password !== "string" || password.trim().length === 0) {
       return sendResponse(res, 400, {
         error: "Password cannot be empty",

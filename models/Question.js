@@ -1,4 +1,3 @@
-// Question.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -11,7 +10,8 @@ const Question = sequelize.define(
       autoIncrement: true,
     },
     questionid: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       unique: true,
     },

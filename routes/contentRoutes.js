@@ -1,7 +1,3 @@
-/**
- * Content routes
- * Handles updates and deletions for questions and answers
- */
 import express from "express";
 import {
   updateContent,
@@ -11,7 +7,6 @@ import { checkLogin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Protected routes
 router.put("/:id", checkLogin, updateContent);
 router.delete("/:id", checkLogin, deleteContent);
 

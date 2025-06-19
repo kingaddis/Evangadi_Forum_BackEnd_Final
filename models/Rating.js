@@ -1,6 +1,3 @@
-/**
- * Sequelize model for Rating
- */
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -42,6 +39,5 @@ const Rating = sequelize.define(
     timestamps: false,
   }
 );
-
 
 export default Rating;

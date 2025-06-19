@@ -1,4 +1,3 @@
-// QuestionTag.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -24,7 +23,7 @@ const QuestionTag = sequelize.define(
   },
   {
     tableName: "QuestionTag",
-    timestamps: false, // Explicitly disable timestamps
+    timestamps: false,
   }
 );
 

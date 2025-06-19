@@ -1,13 +1,6 @@
-/**
- * Sequelize model for Category
- * Stores predefined categories for questions
- */
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-/**
- * Category model definition
- */
 const Category = sequelize.define(
   "Category",
   {
