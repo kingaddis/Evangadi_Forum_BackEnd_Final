@@ -10,7 +10,7 @@ export const checkUser = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { userid: req.user.userid },
-      attributes: ["userid", "username", "firstName", "lastName", "email"],
+      attributes: ["userid", "username", "firstname", "lastname", "email"],
     });
     if (!user) {
       return sendResponse(res, 404, { error: "User not found" });
