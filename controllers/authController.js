@@ -1,3 +1,7 @@
+/**
+ * Authentication controller
+ * Handles user registration, login, and password reset
+ */
 import bcrypt from "bcrypt";
 import { makeToken } from "../utils/jwt.js";
 import { User } from "../models/index.js";
@@ -6,11 +10,16 @@ import crypto from "crypto";
 import { sendResponse } from "../utils/responseHandler.js";
 import { Op } from "sequelize";
 
+/**
+ * Check authenticated user
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
 export const checkUser = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { userid: req.user.userid },
-      attributes: ["userid", "username", "firstname", "lastname", "email"],
+      attributes: ["userid", "username", "firstName", "lastName", "email"],
     });
     if (!user) {
       return sendResponse(res, 404, { error: "User not found" });
@@ -22,12 +31,17 @@ export const checkUser = async (req, res) => {
   }
 };
 
+/**
+ * Register new user
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
 export const register = async (req, res) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
 
     const existingUser = await User.findOne({
-      where: { [Op.or]: [{ username }, { email }] },
+      where: { username, email },
     });
     if (existingUser?.username === username) {
       return sendResponse(res, 400, { error: "Username already taken" });
@@ -56,6 +70,11 @@ export const register = async (req, res) => {
   }
 };
 
+/**
+ * Login user
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -86,6 +105,11 @@ export const login = async (req, res) => {
   }
 };
 
+/**
+ * Request password reset
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -95,7 +119,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    const resetTokenExpiry = new Date(Date.now() + 3600000); // Convert to Date object
 
     await User.update(
       { reset_token: resetToken, reset_token_expiry: resetTokenExpiry },
@@ -110,21 +134,29 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+/**
+ * Reset password
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
+/**
+ * Reset password
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ */
 export const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     let password = newPassword;
 
     if (!password) {
-      return sendResponse(res, 400, {
-        error: "Password is required",
-      });
+      return sendResponse(res, 400, { error: "Password is required" });
     }
 
     const user = await User.findOne({
       where: {
         reset_token: token,
-        reset_token_expiry: { [Op.gt]: Date.now() },
+        reset_token_expiry: { [Op.gt]: new Date() }, // Compare with current Date
       },
     });
 
@@ -135,9 +167,7 @@ export const resetPassword = async (req, res) => {
     }
 
     if (typeof password !== "string" || password.trim().length === 0) {
-      return sendResponse(res, 400, {
-        error: "Password cannot be empty",
-      });
+      return sendResponse(res, 400, { error: "Password cannot be empty" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

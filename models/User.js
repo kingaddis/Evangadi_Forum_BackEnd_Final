@@ -35,7 +35,7 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
     },
     reset_token_expiry: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.DATE, // Changed from BIGINT to DATE
     },
     created_at: {
       type: DataTypes.DATE,
