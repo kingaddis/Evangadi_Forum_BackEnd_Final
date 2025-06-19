@@ -29,9 +29,22 @@ export const getQuestions = async (req, res) => {
 
     const { count, rows } = await Question.findAndCountAll({
       where: { ...where, ...categoryCondition },
+      attributes: [
+        "id",
+        "questionid",
+        "title",
+        "description",
+        "created_at",
+        "updated_at",
+      ],
       include: [
-        { model: User, attributes: ["username"] },
-        { model: Tag, through: { attributes: [] }, attributes: ["name"] },
+        { model: User, attributes: ["username"], as: "User" },
+        {
+          model: Tag,
+          through: { attributes: [] },
+          attributes: ["name"],
+          as: "Tags",
+        },
       ],
       offset,
       limit: parseInt(limit),
@@ -43,17 +56,20 @@ export const getQuestions = async (req, res) => {
       questionid: q.questionid,
       title: q.title,
       description: q.description,
-      username: q.User?.username,
+      username: q.User?.username || "Unknown",
       created_at: q.created_at,
       updated_at: q.updated_at,
-      tags: q.Tag?.map((tag) => tag.name),
+      tags: q.Tags?.map((tag) => tag.name) || [],
     }));
 
     const totalPages = Math.ceil(count / parseInt(limit));
     sendResponse(res, 200, { questions, totalPages });
   } catch (error) {
     console.error("Get questions error:", error);
-    sendResponse(res, 500, { error: "Failed to fetch questions" });
+    sendResponse(res, 500, {
+      error: "Failed to fetch questions",
+      details: error.message,
+    });
   }
 };
 
@@ -62,10 +78,23 @@ export const getQuestionById = async (req, res) => {
     const { questionid } = req.params;
     const question = await Question.findOne({
       where: { questionid },
+      attributes: [
+        "id",
+        "questionid",
+        "title",
+        "description",
+        "created_at",
+        "updated_at",
+      ],
       include: [
-        { model: User, attributes: ["userid", "username"] },
-        { model: Tag, through: { attributes: [] }, attributes: ["name"] },
-        { model: Category, attributes: ["name"] },
+        { model: User, attributes: ["userid", "username"], as: "User" },
+        {
+          model: Tag,
+          through: { attributes: [] },
+          attributes: ["name"],
+          as: "Tags",
+        },
+        { model: Category, attributes: ["name"], as: "Category" },
       ],
     });
 
@@ -76,14 +105,14 @@ export const getQuestionById = async (req, res) => {
     sendResponse(res, 200, {
       id: question.id,
       questionid: question.questionid,
-      userid: question.User.userid,
-      username: question.User.username,
+      userid: question.User?.userid,
+      username: question.User?.username || "Unknown",
       title: question.title,
       description: question.description,
       created_at: question.created_at,
       updated_at: question.updated_at,
-      tags: question.Tag?.map((tag) => tag.name),
-      category: question.Category.name,
+      tags: question.Tags?.map((tag) => tag.name) || [],
+      category: question.Category?.name,
     });
   } catch (error) {
     console.error("Get question error:", error);
@@ -134,7 +163,7 @@ export const createQuestion = async (req, res) => {
       tagRecords = await Promise.all(
         tags.map(async (tagName) => {
           const trimmedTag = tagName.trim();
-          const [tag, created] = await Tag.findOrCreate({
+          const [tag] = await Tag.findOrCreate({
             where: { name: trimmedTag },
             defaults: { name: trimmedTag },
           });

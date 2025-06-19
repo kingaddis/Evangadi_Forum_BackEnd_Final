@@ -19,7 +19,7 @@ const Question = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    categoryId: {
+    categoryid: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

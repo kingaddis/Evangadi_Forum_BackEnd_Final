@@ -4,7 +4,7 @@ import sequelize from "../config/database.js";
 const QuestionTag = sequelize.define(
   "QuestionTag",
   {
-    questionId: {
+    questionid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -12,7 +12,7 @@ const QuestionTag = sequelize.define(
         key: "id",
       },
     },
-    tagId: {
+    tagid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
