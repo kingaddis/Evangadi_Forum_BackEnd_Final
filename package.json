@@ -1,7 +1,9 @@
 {
   "name": "myapp-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "description": "Backend for Evangadi Forum",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
