@@ -5,10 +5,10 @@ import sequelize from "../config/database.js";
 export const submitRating = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    const { answerId, rating } = req.body;
+    const { answerid, rating } = req.body;
     const { userid } = req.user;
 
-    if (!answerId || rating == null || rating < 0 || rating > 5) {
+    if (!answerid || rating == null || rating < 0 || rating > 5) {
       await transaction.rollback();
       return sendResponse(res, 400, {
         success: false,
@@ -25,7 +25,7 @@ export const submitRating = async (req, res) => {
     }
 
     const answer = await Answer.findOne({
-      where: { answerid: answerId },
+      where: { answerid: answerid },
       include: [
         {
           model: User,
@@ -54,12 +54,12 @@ export const submitRating = async (req, res) => {
 
     const [ratingRecord, created] = await Rating.findOrCreate({
       where: {
-        answerId: answerId,
+        answerid: answerid,
         userId: userid,
       },
       defaults: {
         rating,
-        answerId,
+        answerid,
         userId: userid,
       },
       transaction,
@@ -70,7 +70,7 @@ export const submitRating = async (req, res) => {
     }
 
     const allRatings = await Rating.findAll({
-      where: { answerId: answerId },
+      where: { answerid: answerid },
       attributes: ["rating"],
       transaction,
     });
@@ -104,10 +104,10 @@ export const submitRating = async (req, res) => {
 
 export const getUserRating = async (req, res) => {
   try {
-    const { answerId } = req.params;
+    const { answerid } = req.params;
     const { userid } = req.user;
 
-    if (!answerId) {
+    if (!answerid) {
       return sendResponse(res, 400, {
         success: false,
         error: "Answer ID is required",
@@ -116,7 +116,7 @@ export const getUserRating = async (req, res) => {
 
     const rating = await Rating.findOne({
       where: {
-        answerId: answerId,
+        answerid: answerid,
         userId: userid,
       },
       attributes: ["rating"],

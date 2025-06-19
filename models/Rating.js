@@ -9,7 +9,7 @@ const Rating = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
-    answerId: {
+    answerid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -17,7 +17,7 @@ const Rating = sequelize.define(
         key: "answerid",
       },
     },
-    userId: {
+    userid: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
