@@ -1,7 +1,6 @@
 import { Op } from "sequelize";
 import { Question, User, Tag, Category } from "../models/index.js";
 import { sendResponse } from "../utils/responseHandler.js";
-import sequelize from "../config/database.js";
 
 export const getQuestions = async (req, res) => {
   try {
@@ -47,7 +46,7 @@ export const getQuestions = async (req, res) => {
       username: q.User?.username,
       created_at: q.created_at,
       updated_at: q.updated_at,
-      tags: q.Tags.map((tag) => tag.name),
+      tags: q.Tag?.map((tag) => tag.name),
     }));
 
     const totalPages = Math.ceil(count / parseInt(limit));
@@ -83,7 +82,7 @@ export const getQuestionById = async (req, res) => {
       description: question.description,
       created_at: question.created_at,
       updated_at: question.updated_at,
-      tags: question.Tags.map((tag) => tag.name),
+      tags: question.Tag?.map((tag) => tag.name),
       category: question.Category.name,
     });
   } catch (error) {

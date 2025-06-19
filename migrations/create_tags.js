@@ -18,6 +18,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('tagTable');
+    await queryInterface.dropTable('tagtable');
   },
 };
