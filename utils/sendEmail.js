@@ -5,6 +5,14 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
 dotenv.config();
+// Create reusable transporter object
+const transporter = nodemailer.createTransport({
+  service: "gmail", // or your SMTP service
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 export const sendResetEmail = async (to, token) => {
   const resetUrl = `${process.env.SENDER_URL}/reset-password/${token}`;
 
