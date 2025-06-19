@@ -41,7 +41,7 @@ const Question = sequelize.define(
     },
   },
   {
-    tableName: "questionTable",
+    tableName: "questiontable",
     timestamps: false,
   }
 );

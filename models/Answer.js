@@ -31,7 +31,7 @@ const Answer = sequelize.define(
     },
   },
   {
-    tableName: "answerTable",
+    tableName: "answertable",
     timestamps: false,
   }
 );

@@ -8,7 +8,7 @@ const QuestionTag = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "questionTable",
+        model: "questiontable",
         key: "id",
       },
     },
@@ -16,13 +16,13 @@ const QuestionTag = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "tagTable",
+        model: "tagtable",
         key: "id",
       },
     },
   },
   {
-    tableName: "QuestionTag",
+    tableName: "Questiontag",
     timestamps: false,
   }
 );
