@@ -16,7 +16,26 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+// List of allowed frontends (add more if needed)
+const allowedOrigins = [
+  "http://localhost:3000", // local dev
+  "https://teamone-evangadi-forum.netlify.app", // deployed frontend
+];
+
+// CORS options with dynamic origin check
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // ✅ allow request
+    } else {
+      callback(new Error("Not allowed by CORS")); // ❌ block unknown origins
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
