@@ -40,15 +40,13 @@ export const register = async (req, res) => {
   try {
     const { username, firstname, lastname, email, password } = req.body;
 
-    const existingUser = await User.findOne({
-      where: { username, email },
-    });
-    if (existingUser?.username === username) {
+    const usernameExists = await User.findOne({ where: { username } });
+    if (usernameExists)
       return sendResponse(res, 400, { error: "Username already taken" });
-    }
-    if (existingUser?.email === email) {
+
+    const emailExists = await User.findOne({ where: { email } });
+    if (emailExists)
       return sendResponse(res, 400, { error: "Email already registered" });
-    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
