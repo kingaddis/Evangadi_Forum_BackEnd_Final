@@ -1,11 +1,18 @@
+// File: backend/controllers/answerController.js
 import { Answer, User, Question, Rating } from "../models/index.js";
 import { sendResponse } from "../utils/responseHandler.js";
 
+// Controller to fetch answers for a question with pagination
 export const getAnswers = async (req, res) => {
   try {
+    // Extract question ID from URL parameters
     const { questionid } = req.params;
+    // Extract page and limit from query parameters, default to page 1 and 5 answers per page
+    const { page = 1, limit = 5 } = req.query;
+    // Get authenticated user's ID
     const userId = req.user?.userid;
 
+    // Validate question ID presence
     if (!questionid) {
       return sendResponse(res, 400, {
         success: false,
@@ -13,6 +20,7 @@ export const getAnswers = async (req, res) => {
       });
     }
 
+    // Check if the question exists
     const question = await Question.findOne({ where: { questionid } });
     if (!question) {
       return sendResponse(res, 404, {
@@ -21,6 +29,17 @@ export const getAnswers = async (req, res) => {
       });
     }
 
+    // Calculate offset for pagination (e.g., page 2, limit 5 -> offset = (2-1)*5 = 5)
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    // Ensure limit is a number
+    const limitValue = parseInt(limit);
+
+    // Fetch total count of answers for the question
+    const totalAnswers = await Answer.count({ where: { questionid } });
+    // Calculate total pages (e.g., 12 answers, limit 5 -> ceil(12/5) = 3 pages)
+    const totalPages = Math.ceil(totalAnswers / limitValue);
+
+    // Fetch paginated answers with associated user and rating data
     const answers = await Answer.findAll({
       where: { questionid },
       include: [
@@ -42,13 +61,18 @@ export const getAnswers = async (req, res) => {
           ],
         },
       ],
-      order: [["created_at", "ASC"]],
+      order: [["created_at", "ASC"]], // Sort answers by creation date
+      limit: limitValue, // Limit number of answers per page
+      offset, // Skip records based on page number
     });
 
+    // Format answers with user rating and average rating
     const formattedAnswers = answers.map((answer) => {
       const ratings = answer.Ratings || [];
+      // Find the authenticated user's rating for this answer
       const userRating =
         ratings.find((r) => r.Rater?.userid === userId)?.rating || 0;
+      // Calculate average rating
       const averageRating =
         ratings.length > 0
           ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
@@ -67,12 +91,21 @@ export const getAnswers = async (req, res) => {
       };
     });
 
+    // Send response with paginated answers and metadata
     sendResponse(res, 200, {
       success: true,
       answers: formattedAnswers,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalAnswers,
+        limit: limitValue,
+      },
     });
   } catch (error) {
+    // Log error for debugging
     console.error("Error fetching answers:", error);
+    // Send error response
     sendResponse(res, 500, {
       success: false,
       error: "Failed to fetch answers",
@@ -82,11 +115,15 @@ export const getAnswers = async (req, res) => {
   }
 };
 
+// Controller to create a new answer (unchanged, included for completeness)
 export const createAnswer = async (req, res) => {
   try {
+    // Extract question ID and answer content from request body
     const { questionid, answer } = req.body;
+    // Get authenticated user's ID
     const { userid } = req.user;
 
+    // Validate required fields
     if (!answer || !questionid) {
       return sendResponse(res, 400, {
         success: false,
@@ -94,6 +131,7 @@ export const createAnswer = async (req, res) => {
       });
     }
 
+    // Check if the question exists
     const question = await Question.findOne({ where: { questionid } });
     if (!question) {
       return sendResponse(res, 404, {
@@ -102,12 +140,14 @@ export const createAnswer = async (req, res) => {
       });
     }
 
+    // Create new answer in the database
     const newAnswer = await Answer.create({
       questionid,
       userid,
       answer,
     });
 
+    // Send success response with the created answer
     sendResponse(res, 201, {
       success: true,
       message: "Answer created successfully",
@@ -120,7 +160,9 @@ export const createAnswer = async (req, res) => {
       },
     });
   } catch (error) {
+    // Log error for debugging
     console.error("Error creating answer:", error);
+    // Send error response
     sendResponse(res, 500, {
       success: false,
       error: "Failed to create answer",

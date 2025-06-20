@@ -8,17 +8,30 @@ export const getQuestions = async (req, res) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let where = {};
+    let include = [
+      { model: User, attributes: ["username"], as: "User" },
+      {
+        model: Tag,
+        through: { attributes: [] },
+        attributes: ["name"],
+        as: "Tags",
+      },
+    ];
+
+    // Build search conditions for title, description, and tags
     if (search) {
       where[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
         { description: { [Op.iLike]: `%${search}%` } },
       ];
+      // Add tag search condition
+      include[1].where = { name: { [Op.iLike]: `%${search}%` } };
     }
 
     let categoryCondition = {};
     if (category) {
       const categoryRecord = await Category.findOne({
-        where: { name: category },
+        where: { name: { [Op.iLike]: category } },
       });
       if (categoryRecord) {
         categoryCondition = { categoryid: categoryRecord.id };
@@ -37,18 +50,11 @@ export const getQuestions = async (req, res) => {
         "created_at",
         "updated_at",
       ],
-      include: [
-        { model: User, attributes: ["username"], as: "User" },
-        {
-          model: Tag,
-          through: { attributes: [] },
-          attributes: ["name"],
-          as: "Tags",
-        },
-      ],
+      include,
       offset,
       limit: parseInt(limit),
       order: [["created_at", "DESC"]],
+      distinct: true, // Ensure unique questions when filtering by tags
     });
 
     const questions = rows.map((q) => ({

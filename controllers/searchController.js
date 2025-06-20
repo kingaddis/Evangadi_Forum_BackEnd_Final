@@ -25,7 +25,13 @@ export const searchQuestions = async (req, res) => {
           through: { attributes: [] },
           attributes: ["name"],
           where: { name: { [Op.iLike]: `%${query}%` } },
-          required: false,
+          required: false, // Keep false to include questions even if tags don't match
+        },
+        {
+          model: Category,
+          attributes: ["name"],
+          where: { name: { [Op.iLike]: `%${query}%` } },
+          required: false, // Keep false to include questions even if category doesn't match
         },
       ],
       offset,
@@ -39,8 +45,9 @@ export const searchQuestions = async (req, res) => {
       title: q.title,
       description: q.description,
       username: q.User?.username,
+      category: q.Category?.name, // Include category name in response
       created_at: q.created_at,
-      tags: q.Tag?.name?.map((tag) => tag.name),
+      tags: q.Tags?.map((tag) => tag.name) || [], // Handle tags array safely
     }));
 
     const totalPages = Math.ceil(count / parseInt(limit));
