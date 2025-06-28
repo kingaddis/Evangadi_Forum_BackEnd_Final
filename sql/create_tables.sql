@@ -13,8 +13,7 @@ CREATE TABLE userTable (
 
 -- Create categoryTable
 CREATE TABLE categoryTable (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
+    id SERIAL PRIMARY KEY,   name VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- Insert predefined categories
@@ -47,7 +46,7 @@ CREATE TABLE questionTable (
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\
 );
 
 -- Create answerTable
@@ -83,3 +82,4 @@ CREATE INDEX idx_answer_questionid ON answerTable(questionid);
 CREATE INDEX idx_rating_answerId ON ratingTable(answerId);
 CREATE INDEX idx_questiontag_questionId ON QuestionTag(questionId);
 CREATE INDEX idx_questiontag_tagId ON QuestionTag(tagId);
+ 

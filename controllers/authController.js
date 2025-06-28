@@ -2,7 +2,7 @@
  * Authentication controller
  * Handles user registration, login, and password reset
  */
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { makeToken } from "../utils/jwt.js";
 import { User } from "../models/index.js";
 import { sendResetEmail } from "../utils/sendEmail.js";
