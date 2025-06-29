@@ -134,7 +134,18 @@ app.use((err, req, res, next) => {
     details: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
-
+app.get('/api/connection-test', (req, res) => {
+  console.log('Received headers:', req.headers);
+  res.json({
+    status: 'success',
+    message: 'Backend is connected!',
+    headers: {
+      authorization: req.headers.authorization || 'No token provided',
+      origin: req.headers.origin || 'No origin header'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
